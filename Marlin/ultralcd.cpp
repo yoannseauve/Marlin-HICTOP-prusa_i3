@@ -993,6 +993,8 @@ void kill_screen(const char* lcd_msg) {
       lcd_goto_screen(_lcd_z_offset_edit);
     }
 
+    
+
   #endif // AUTO_BED_LEVELING_UBL
 
 
@@ -1686,6 +1688,13 @@ void kill_screen(const char* lcd_msg) {
    *
    */
 
+    static void lcd_autohome_all_axes() { //move z after homing to prevent beg domage from hot head
+      enqueue_and_echo_commands_P(PSTR("G28"));
+      #ifdef Z_MOVE_AFTER_HOMING
+      enqueue_and_echo_commands_P(PSTR("G1 Z" Z_MOVE_AFTER_HOMING));
+      #endif
+    }
+
   void lcd_prepare_menu() {
     START_MENU();
 
@@ -1705,7 +1714,8 @@ void kill_screen(const char* lcd_msg) {
     //
     // Auto Home
     //
-    MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
+
+    MENU_ITEM(function, MSG_AUTO_HOME, lcd_autohome_all_axes);
     #if ENABLED(INDIVIDUAL_AXIS_HOMING_MENU)
       MENU_ITEM(gcode, MSG_AUTO_HOME_X, PSTR("G28 X"));
       MENU_ITEM(gcode, MSG_AUTO_HOME_Y, PSTR("G28 Y"));
